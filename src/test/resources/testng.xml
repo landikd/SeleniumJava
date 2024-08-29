@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="ParallelSuite" parallel="classes" thread-count="10">
+    <test name="ParallelTest">
+        <classes>
+            <class name="testPageTitle"/>
+            <class name="testClick"/>
+            <class name="testTextInput"/>
+            <class name="testScrollbars"/>
+            <class name="testDynamicTable"/>
+            <class name="testVerifyText"/>
+        </classes>
+    </test>
+</suite>
