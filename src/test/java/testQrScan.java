@@ -29,13 +29,12 @@ public class testQrScan {
     public void setUp() throws MalformedURLException {
         // Generate QR code
         try {
-            createQrCode.generateQrCode(); // Вызов статического метода
+            createQrCode.generateQrCode(); // Call the static method to generate a QR code
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-
-        // Копирование файлов перед началом тестов
+        // Copy files before starting the tests
         try {
             copyFiles("src/test/resources/QrScan", "C:\\Users\\landi\\AppData\\Local\\Android\\Sdk\\emulator\\resources");
         } catch (IOException e) {
@@ -43,12 +42,13 @@ public class testQrScan {
         }
     }
 
+    // Method to copy files from one directory to another
     private void copyFiles(String sourceDirPath, String targetDirPath) throws IOException {
         File sourceDir = new File(sourceDirPath);
         File targetDir = new File(targetDirPath);
 
         if (!targetDir.exists()) {
-            targetDir.mkdirs();
+            targetDir.mkdirs(); // Create the target directory if it doesn't exist
         }
 
         File[] files = sourceDir.listFiles();
@@ -61,7 +61,7 @@ public class testQrScan {
                     } else {
                         System.out.println("Copying file: " + targetFile.getName());
                     }
-                    Files.copy(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING); // Copy the file
                 }
             }
         }
@@ -69,7 +69,7 @@ public class testQrScan {
 
     @AfterClass
     public void tearDown() {
-        // Закрытие сессии драйвера
+        // Close the driver session
         if (driver != null) {
             driver.quit();
         }
@@ -79,7 +79,7 @@ public class testQrScan {
     public Object[][] deviceData() {
         return new Object[][] {
                 {"emulator-5554", "emulator-5554", "Android", "35"}
-                // Добавьте другие наборы параметров по мере необходимости
+                // Add other parameter sets as needed
         };
     }
 
@@ -98,10 +98,11 @@ public class testQrScan {
 
         driver = new AndroidDriver(url, options);
         System.out.println("Application started with device: " + deviceName);
-        // Установка времени ожидания
+
+        // Set the wait time
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        // Найдите кнопку по тексту и нажмите на неё
+        // Find the "Allow while using the app" button by its resource ID and click on it
         WebElement allowWhileButton = wait.until(ExpectedConditions.presenceOfElementLocated(
                 AppiumBy.androidUIAutomator(
                         "new UiSelector().resourceId(\"com.android.permissioncontroller:id/permission_allow_foreground_only_button\")")
@@ -109,30 +110,31 @@ public class testQrScan {
 
         allowWhileButton.click();
 
+        // Find the barcode text element and retrieve its text
         WebElement targetUrl = wait.until(ExpectedConditions.presenceOfElementLocated(
                 AppiumBy.id("com.example.barcodescanner:id/text_view_barcode_text")
         ));
 
-        // Ожидаемый текст
+        // Expected text after scanning the QR code
         String expectedText = "https://uitestingplayground.com/";
 
-        // Проверка, что текст правильный
+        // Verify that the scanned text is correct
         String currentText = targetUrl.getText();
-
         Assert.assertEquals(currentText, expectedText, basicMessage);
 
+        // Click on the URL to open it in the browser
         targetUrl.click();
 
+        // Find the welcome text element in the Chrome browser and verify its text
         WebElement welcomeText = wait.until(ExpectedConditions.presenceOfElementLocated(
                 AppiumBy.id("com.android.chrome:id/title")
         ));
 
-        // Ожидаемый текст
+        // Expected text in the Chrome browser
         expectedText = "Welcome to Chrome";
 
-        // Проверка, что текст правильный
+        // Verify that the welcome text is correct
         currentText = welcomeText.getText();
-
         Assert.assertEquals(currentText, expectedText, basicMessage);
     }
 }

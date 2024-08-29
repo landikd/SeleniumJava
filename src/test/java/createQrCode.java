@@ -23,27 +23,27 @@ public class createQrCode {
     static WebDriverWait wait;
 
     public static void generateQrCode() throws InterruptedException {
-        // Укажите путь к драйверу Chrome
+        // Set Driver location
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\landi\\Desktop\\chromedriver-win64\\chromedriver.exe");
 
-        // Настройка параметров Chrome
+        // Set Chrome parameters
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--start-maximized");
 
-        // Инициализация объекта WebDriver
+        // WebDriver initialization
         driver = new ChromeDriver(options);
 
-        // Установка времени ожидания
+        // Wait times setting
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        // Открытие веб-страницы
+        // QR generator service web page opening
         driver.get("https://www.qr-code-generator.com/");
 
-        // Найти текстовое поле для ввода ссылки
+        // Find the QR generator field for transfering URL to QR
         WebElement pageElement = wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//qrcg-generator-form-start-dynamic/form/div/div/textarea")));
 
-        // Ввод URL для генерации QR-кода
+        // Input URL for QR code generation
         pageElement.sendKeys("https://uitestingplayground.com/");
 
         pageElement = wait.until((ExpectedConditions.presenceOfElementLocated(
@@ -58,17 +58,17 @@ public class createQrCode {
 
         pageElement.click();
 
-        // Ожидание генерации QR-кода
+        // Wait for QR code element
         WebElement qrCodeImage = wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.id("FrameBody")));
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView(true);", qrCodeImage);
 
-        // Сохранение скриншота элемента с QR-кодом
+        // Save screenshot of an element with QR code
         captureElementScreenshot(qrCodeImage, "src/test/resources/QrScan/custom.png");
 
-        // Закрытие браузера
+        // Close browser
         if (driver != null) {
             driver.quit();
         }
@@ -76,22 +76,22 @@ public class createQrCode {
 
     public static void captureElementScreenshot(WebElement element, String filePath) {
         try {
-            // Делаем скриншот всего экрана
+            // Making screnshot for of a whole screen
             File screen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 
-            // Получаем границы элемента
+            // Get element boundaries
             Rectangle elementRect = element.getRect();
 
-            // Настраиваем смещение и размеры (в пикселях)
+            // Adjust boundaries to catch the QR code (in pixels)
             int offsetX = -150; // Смещение по X
             int offsetY = 200; // Смещение по Y
             int widthAdjustment = 200; // Корректировка ширины
             int heightAdjustment = 200; // Корректировка высоты
 
-            // Читаем изображение экрана в BufferedImage
+            // Page to BufferedImage
             BufferedImage img = ImageIO.read(screen);
 
-            // Обрезаем изображение до границ элемента с учетом смещений и корректировок
+            // Cut the image according to adjustments
             BufferedImage elementScreenshot = img.getSubimage(
                     Math.max(0, elementRect.getX() - offsetX),
                     Math.max(0, elementRect.getY() - offsetY),
@@ -99,7 +99,7 @@ public class createQrCode {
                     Math.min(img.getHeight() - Math.max(0, elementRect.getY() - offsetY), elementRect.getHeight() + heightAdjustment)
             );
 
-            // Сохраняем обрезанное изображение
+            // Save cut QR code image
             ImageIO.write(elementScreenshot, "png", new File(filePath));
         } catch (IOException e) {
             e.printStackTrace();
